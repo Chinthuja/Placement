@@ -111,7 +111,7 @@ mail  IN      A         192.168.65.148
 www   IN      A         192.168.65.148
 
 
-#Check  forward zone file
+#Check  reverse zone file
 named-checkzone test.com  rev.test.com
 
 #load data file rev.test.com for zone test.com
