@@ -1,0 +1,34 @@
+#alerting shell script
+#This bash script is a quick way to monitor any service in Linux
+#If the service is stopped it will try to restart is and send a mail to the user that the service is stopped
+#It will attempt to restart the service if the service is stopped
+# this can be used for any service monitoring
+#configure the smtp server, service name and email ID in the script
+
+ 
+
+#!/bin/bash
+
+###edit the following
+export smtp=smtprelay.domainname.com:25
+service=dns
+email=mailID@abc.com
+###You can provide multiple mail ID's above in email variable separated by commas
+###stop editing
+
+host=`hostname -f`
+if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 2 ))
+then
+echo "$service is running"
+else
+/opt/dns/bin/$service restart
+if (( $(ps -ef | grep -v grep | grep $service | wc -l) > 2 ))
+then
+subject="$service at $host has been started"
+echo "$service at $host wasn't running and has been started" | mailx -s "$subject" $email
+else
+subject="$service at $host is not running"
+echo "$service at $host is stopped and cannot be started!!!" | mailx -s "$subject" $email
+fi
+fi
+

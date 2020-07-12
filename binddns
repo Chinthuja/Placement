@@ -1,4 +1,4 @@
-#creating a dns with dnssec and telemmetry/alerting for a subnetwork
+#creating a dns with dnssec for a subnetwork
 #Shellscripting carried out in local host vm 
 #Shellscripting to create dns server on linux using bind9
 #host ip address=192.168.65.148
@@ -13,7 +13,7 @@ named -v
 ls/etc/bind
 cd/var/cache/bind
 
-#caching name server
+#caching name server and enabling dnssec
 options {
         listen-on port 53 { 127.0.0.1; 192.168.65.148; };
 //      listen-on-v6 port 53 { ::1; };
