@@ -1,0 +1,16 @@
+
+# to setup auto-DNSSEC, the following option is added to the configuration file /etc/named.conf:
+
+key-directory "/etc/bind/keys"
+
+# 'auto-dnssec maintain' and 'update-policy local' options are added to each individual zone configuration:
+
+zone "example.nl" {
+  type master;
+  file "db.example.nl";
+  auto-dnssec maintain;
+  update-policy local;
+  };
+  
+#To load the new configuration by BIND named.
+rndc reconfig
