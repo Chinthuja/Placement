@@ -1,0 +1,67 @@
+
+
+#Generating key pairs and signing the zone file
+#DNS zone file
+
+
+$TTL 1d  ; ttl is 1 day
+@               IN      SOA     dns1.example.nl. dns.example.nl. (
+                                2017101300     ; serial (date & version)
+                                8h             ; refresh every 8 hours
+                                20m            ; retry after 20 minutes
+                                4w             ; expire after 4 weeks
+                                20m            ; negative caching ttl is 20 minutes
+                                )
+
+; DNS name servers
+                IN      NS      dns1.example.nl.  ; primary name server
+                IN      NS      dns2.example.nl.  ; secondary name server
+
+; SMTP mail gateways
+                IN      MX      10 mx.example.nl.            ; MX gateway
+                IN      MX      100 fallback-mx.example.nl.  ; fallback MX gateway
+
+; hosts
+                IN      A       192.168.129.36        ; server
+                IN      AAAA    a022:2f87:1098::2:14  ; server (IPv6)
+www             IN      CNAME   example.nl.           ; WWW server
+ftp             IN      CNAME   example.nl.           ; FTP server
+mx              IN      A       192.168.128.34        ; mail gateway
+mx              IN      AAAA    a022:2f87:1098::1:6   ; mail gateway (IPv6)
+mail            IN      A       192.168.128.35        ; mail server
+mail            IN      AAAA    a022:2f87:1098::1:7   ; mail server (IPv6)
+
+; exterior hosts
+dns1            IN      A       172.16.64.5           ; primary name server
+dns1            IN      AAAA    2f87:a022:0941::8:5   ; primary name server (IPv6)
+dns2            IN      A       172.16.128.6          ; secondary name server
+dns2            IN      AAAA    2f87:a022:0941::16:6  ; secondary name server (IPv6)
+fallback-mx     IN      A       10.184.172.36         ; fallback mail gateway
+fallback-mx     IN      AAAA    0941:20a2:7f34::32:7  ; fallback mail gateway (IPv6)
+
+#zone file is configured as the master (primary) in the file /etc/named.conf:
+ zone "example.nl" {
+  type master;
+  file "db.example.nl";
+  };
+  
+#The configuration of DNSSEC for BIND named carried out by the addition of this option to the configuration file:
+dnssec-enable yes;
+
+#KSK pair generation
+mkdir -p /etc/bind/keys/
+cd /etc/bind/keys/
+
+dnssec-keygen -f KSK -3 -a ECDSAP256SHA256 -r /dev/random example.nl
+ 
+
+#generate the ZSK pair, but without the '-f KSK' option:
+dnssec-keygen -3 -a ECDSAP256SHA256 -r /dev/random example.nl
+
+
+ #to manually sign the existing zone file db.example.nl:
+dnssec-signzone -S -K /etc/bind/keys/ -g -a -r /dev/random -o example.nl db.example.nl
+
+#verification
+dnssec-verify -o example.nl db.example.nl.signed
+
