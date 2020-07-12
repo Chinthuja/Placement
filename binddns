@@ -1,6 +1,7 @@
 #creating a dns with dnssec for a subnetwork
 #Shellscripting carried out in local host vm 
 #Shellscripting to create dns server on linux using bind9
+From version 9.7.0, BIND named supports the 'auto-dnssec' zone configuration option
 #host ip address=192.168.65.148
 
 # Install the bind9
